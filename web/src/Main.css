@@ -1,0 +1,50 @@
+main {
+    width: 1200px;
+    box-shadow: 0 0 14px 0 rgba(0, 0, 0, 0);
+    border-radius: 2px;
+    padding: 60px 40px;
+}
+
+main strong {
+    font-size: 40px;
+    text-align: center;
+    display: block;
+    color: #333;
+}
+
+main form {
+    margin-top: 30px;
+}
+
+main form .input-block + .input-block{
+    margin-top: 20px;
+}
+
+main form .input-block {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 40% 60% ;
+}
+
+main form .input-block label {
+    color: #acacac;
+    font-size: 20px;
+    font-weight: bold;
+    display: block;
+    text-align: right;
+}
+
+main form .input-block input {
+    width: 100%;
+    height: 32px;
+    font-size: 20px;
+    color: #666;
+    border: 0;
+    border-bottom: 1px solid #eee;
+}
+
+main form .class-button {
+    text-align: center;
+    border: 0;
+    margin-top: 20px;
+}
