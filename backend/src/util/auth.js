@@ -25,8 +25,8 @@ module.exports = {
       if (err) {
         return res.status(401).send({ error: 'Token invalid.' });
       }
-      req.userId = decoded.userId;
-      req.customerId = decoded.customerId;
+      req.matricula = decoded.matricula;
+      req.prefixo = decoded.prefixo;
       cb();
     });
   },

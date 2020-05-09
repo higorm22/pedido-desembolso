@@ -1,0 +1,25 @@
+ 
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "React",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}/frontend/src"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Node",
+            "runtimeExecutable": "${workspaceFolder}/backend/node_modules/nodemon/bin/nodemon.js",
+            "program": "${workspaceFolder}/backend/src/server.js",
+            "envFile": "${workspaceFolder}/backend/src/.env",
+            "restart": true,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        }
+    ]
+}

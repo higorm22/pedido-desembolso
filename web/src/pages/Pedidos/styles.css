@@ -1,0 +1,9 @@
+.wrapper-navbar {
+    background-color: #f0f0f0;
+    width:100%;
+  }
+  
+  .wrapper-navbar .navbar-nav a {
+    color: #f68c04 !important;
+  }
+  

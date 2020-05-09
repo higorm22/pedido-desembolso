@@ -11,7 +11,7 @@ const authMiddleware = require('./middleware/auth');
 const routes = express.Router();
 
 //Authentication
-routes.post('/auth', LoginController.auth);
+routes.post('/login', LoginController.login);
 
 //Registering Middleware
 routes.use(authMiddleware.authenticate);
@@ -19,8 +19,8 @@ routes.use(authMiddleware.authenticate);
 //Pedidos de Desembolso
 routes.get('/pedidos',PedidoController.index);
 routes.post('/pedidos',PedidoController.store);
-routes.put('/pedidos',PedidoController.Update);
-routes.delete('/pedidos',PedidoController.destoy);
+routes.put('/pedidos',PedidoController.update);
+routes.delete('/pedidos',PedidoController.delete);
 
 //Agências
 routes.get('/agencias',AgenciaController.index);
