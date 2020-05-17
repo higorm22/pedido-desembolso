@@ -6,10 +6,8 @@ import localStorage from "local-storage";
 
 export default function App() {
   const doLogin = () => {
-    console.log("REALIZANDO LOGIN...");
     Axios.post("/login")
       .then(async (response) => {
-        console.log(response.data);
         await localStorage.set("token", response.data.token);
         await localStorage.set("matricula", response.data.matricula);
         await localStorage.set("prefixo", response.data.prefixo);
@@ -17,7 +15,7 @@ export default function App() {
       })
       .catch((error) => {
         if (error.response) {
-          console.log(error.response);
+          console.error(error);
         }
       });
   };

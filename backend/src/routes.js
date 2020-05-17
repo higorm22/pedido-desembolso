@@ -18,6 +18,7 @@ routes.use(authMiddleware.authenticate);
 
 //Pedidos de Desembolso
 routes.get('/pedidos',PedidoController.index);
+routes.get('/pedidos/:id',PedidoController.findById);
 routes.post('/pedidos',PedidoController.store);
 routes.put('/pedidos',PedidoController.update);
 routes.delete('/pedidos',PedidoController.delete);

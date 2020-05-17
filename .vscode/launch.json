@@ -16,7 +16,7 @@
             "name": "Node",
             "runtimeExecutable": "${workspaceFolder}/backend/node_modules/nodemon/bin/nodemon.js",
             "program": "${workspaceFolder}/backend/src/server.js",
-            "envFile": "${workspaceFolder}/backend/src/.env",
+            "envFile": "${workspaceFolder}/backend/.env",
             "restart": true,
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"

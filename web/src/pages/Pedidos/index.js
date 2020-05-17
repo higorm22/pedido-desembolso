@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import ls from "local-storage";
+import InputMask from "react-input-mask";
 import {
   Button,
   Row,
@@ -12,49 +14,49 @@ import {
   Image,
 } from "react-bootstrap";
 
-import InputMask from "react-input-mask";
-import ls from "local-storage";
+import MaskedInput from "../../components/masked-input";
+import CustomTable from "../../components/custom-table";
+import Axios from "../../services";
+import { parseStringMoneyToDouble } from "../../util/format";
 import logo from "../../assets/images/logo.png";
 
-import Axios from "../../services";
-
 import "./styles.css";
+
 const Pedido = () => {
   const INITIAL_STATE = {
-    regional: 8888,
-    prefixo: 1610,
-    dependencia: "DependenciaTeste",
-    cliente: "ClienteTeste",
-    nr_proposta: 123,
-    valor: 100000,
-    municipio: "MunicipioTeste",
-    cliente_cop: "ClienteCopTeste",
-    valor_cop: 100000.0,
-    operacao_cop: 123123123,
-    situacao_cop: "SituacaoCopTeste",
-    correio_autorizacao: "CorreioAutorizacaoTeste",
-    linha_cop: "LinhaCopTeste",
-    status: "EM_ANALISE",
-    aut: true,
-    aut_ate: "2020-10-10",
-    mci: 123123123,
-    mci_cop: 123123123,
-    fonte_recurso: "FonteRecursoTeste",
-    ride: "RideTeste",
-    area_atuacao: "AreaAtuacaoTeste",
-    devolucao: "DevolucaoTeste",
-    cartao: 123.0,
-    data_autorizacao: "2020-10-10",
-    data_cadastro: "2020-10-10",
-    estado: "EstadoTeste",
-    motivo_exclusao: "MotivoExclusaoTeste",
-    data_acolhimento: "2020-10-10",
-    taxa_juros: 20.0,
-    data_despacho: "2020-10-10",
-    data_formalizacao: "2020-10-10",
-    prefixo_op: 1610,
-    prorrogrado: true,
-    matricula: "T1073921",
+    regional: 0,
+    prefixo: 0,
+    dependencia: "",
+    cliente: "",
+    nr_proposta: 0,
+    valor: 0.0,
+    municipio: "",
+    cliente_cop: "",
+    valor_cop: 0,
+    operacao_cop: 0,
+    situacao_cop: "DESPACHADA-DEFERIDA",
+    correio_autorizacao: "2020/0000002",
+    linha_cop: "0219 - FCO",
+    status: "ANALISE",
+    aut: false,
+    mci: 0,
+    mci_cop: 0,
+    fonte_recurso: "",
+    ride: "",
+    area_atuacao: "",
+    devolucao: "",
+    cartao: 0,
+    data_autorizacao: "",
+    data_cadastro: "",
+    estado: "",
+    motivo_exclusao: "",
+    data_acolhimento: "",
+    taxa_juros: 0,
+    data_despacho: "",
+    data_formalizacao: "",
+    prefixo_op: 0,
+    prorrogrado: false,
+    matricula: "",
   };
 
   const [pedidos, setPedidos] = useState([]);
@@ -93,7 +95,12 @@ const Pedido = () => {
     e.preventDefault();
     const token = "Bearer " + ls.get("token");
 
-    setPedido({ ...pedido, prefixo: ls.get("prefixo") });
+    let tempPedido = pedido;
+    tempPedido.prefixo = ls.get("prefixo");
+    tempPedido.mci = pedido.mci.split(".").join("");
+    tempPedido.valor = parseStringMoneyToDouble(pedido.valor);
+
+    console.log("pedido", tempPedido);
 
     Axios.post("/pedidos", pedido, {
       Authorization: token,
@@ -118,13 +125,56 @@ const Pedido = () => {
           <Navbar.Brand href="/">
             <Image src={logo} width="40px" />
           </Navbar.Brand>
+          <Navbar.Text>Pedidos Desembolso Agro</Navbar.Text>
           <Nav className="mr-auto"></Nav>
-          <Nav.Link href="">teste@teste.com</Nav.Link>
+          <Nav.Link href="">Higor de Moraes</Nav.Link>
         </Navbar>
       </Row>
+      <p>&nbsp;</p>
+      <Col>
+        <Row>
+          <h4>BB Custeio e PRONAMP Custeio</h4>
+        </Row>
+        <Row className="text-justify">
+          <p>
+            A fonte de recurso para as linhas BB Custeio e PRONAMP Custeio foi
+            alterada.
+          </p>
+          <p>Para mais informações, consultar a IN 607-1 item 2.3.3</p>
+        </Row>
+        <p>&nbsp;</p>
+        <Row>
+          <h4>Prorrogação FCO Rural</h4>
+        </Row>
+        <Row className="text-justify">
+          <p>
+            Para as propostas com a fonte de recurso FCO, somente é permitida a
+            solicitação de prorogação de prazo para datas dentro do mês vigente
+            da proposta. Para solicitar um prazo superior ao permitido pela
+            Super GO, você deve cadastrar um novo pedido com os mesmos dados do
+            anterior. Isso é feito da seguinte maneira:
+          </p>
+          <ul>
+            <li>
+              Clique no botão Prorrogação (verde) ao lado do pedido autorizado.
+              Você será redirecionado à página de pedidos de prorrogação.
+            </li>
+            <li>
+              <strong>Não preencha o formulário na página.</strong>
+              Apenas clique no botão laranja "Prorrogação FCO".
+            </li>
+          </ul>
+          <p>
+            Ao clicar no botão laranja, o pedido autorizado será automaticamente
+            classificado como VENCIDO, e um novo pedido com os dados do anterior
+            e referente à  mesma proposta ficará em análise na Super GO.
+          </p>
+        </Row>
+      </Col>
+      <p>&nbsp;</p>
       <Row>
         <Col>
-          <h1>Pedidos</h1>
+          <h4>Cadastrar Pedidos</h4>
         </Col>
       </Row>
       <Row>
@@ -134,7 +184,6 @@ const Pedido = () => {
               <Alert variant={status.type}>{status.message}</Alert>
             </Col>
           ) : null}
-
           <Col md={6}>
             <Form onSubmit={handleSubmit}>
               {/* INPUT */}
@@ -147,48 +196,123 @@ const Pedido = () => {
                   onChange={(e) =>
                     setPedido({ ...pedido, cliente: e.target.value })
                   }
+                  required
                 />
               </Form.Group>
               {/* INPUT */}
 
               <Row>
-                <Col md={4}>
+                <Col md={6}>
                   {/* INPUT */}
                   <Form.Group controlId="mci">
                     <Form.Label>MCI</Form.Label>
-
-                    <InputMask
-                      className="form-control"
-                      mask="999999999"
-                      maskChar=""
+                    <MaskedInput
+                      name="mci"
+                      maskString={"999.999.999"}
                       onChange={(e) =>
                         setPedido({ ...pedido, mci: e.target.value })
                       }
+                      placeholder="000.000.000"
                       value={pedido.mci}
+                      required
                     />
                   </Form.Group>
                   {/* INPUT */}
                 </Col>
-                <Col md={4}>
+                <Col md={6}>
                   {/* INPUT */}
                   <Form.Label>No. da Proposta</Form.Label>
-                  <InputMask
-                    className="form-control"
-                    mask="999999999"
-                    maskChar=""
+
+                  <MaskedInput
+                    name="nr_proposta"
+                    maskString={"000000000"}
+                    placeholder="000000000"
                     onChange={(e) =>
                       setPedido({ ...pedido, nr_proposta: e.target.value })
                     }
                     value={pedido.nr_proposta}
+                    required
                   />
                   {/* INPUT */}
                 </Col>
               </Row>
-
+              <Row>
+                <Col md={6}>
+                  {/*INPUT*/}
+                  <Form.Label>Valor</Form.Label>
+                  <MaskedInput
+                    name="valor"
+                    isReverse={true}
+                    maskString={"#.##0,00"}
+                    placeholder="0,00"
+                    onChange={(e) =>
+                      setPedido({ ...pedido, valor: e.target.value })
+                    }
+                    value={pedido.valor}
+                  />
+                  <p>&nbsp;</p>
+                </Col>
+                <Col md={6}>
+                  {/*INPUT*/}
+                  <Form.Label>Município do Empreendimento</Form.Label>
+                  <Form.Control
+                    type="municipio"
+                    value={pedido.municipio}
+                    onChange={(e) =>
+                      setPedido({ ...pedido, municipio: e.target.value })
+                    }
+                    required
+                  ></Form.Control>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  {/*INPUT*/}
+                  <Form.Label>Estado</Form.Label>
+                  <Form.Control
+                    as="select"
+                    type="estado"
+                    value={pedido.estado}
+                    onChange={(e) =>
+                      setPedido({ ...pedido, estado: e.target.value })
+                    }
+                    required
+                  >
+                    <option>AC</option>
+                    <option>AL</option>
+                    <option>AP </option>
+                    <option>AM </option>
+                    <option>BA </option>
+                    <option>CE</option>
+                    <option>DF</option>
+                    <option>ES</option>
+                    <option>GO</option>
+                    <option>MA</option>
+                    <option>MT</option>
+                    <option>MS</option>
+                    <option>MG</option>
+                    <option>PA </option>
+                    <option>PB</option>
+                    <option>PR</option>
+                    <option>PE</option>
+                    <option>PI</option>
+                    <option>RJ</option>
+                    <option>RN</option>
+                    <option>RS</option>
+                    <option>RO</option>
+                    <option>RR</option>
+                    <option>SC </option>
+                    <option>SP</option>
+                    <option>SE</option>
+                    <option>TO</option>
+                  </Form.Control>
+                </Col>
+              </Row>
+              <p>&nbsp;</p>
               <Row>
                 <Col>
-                  <Button variant="primary" type="submit">
-                    Salvar
+                  <Button variant="primary" type="submit" block>
+                    Solicitar Pedido
                   </Button>
                 </Col>
               </Row>
@@ -197,8 +321,7 @@ const Pedido = () => {
         </Col>
       </Row>
       <p>&nbsp;</p>
-
-      <Row>
+      {/* <Row>
         <Col>
           <Form.Group controlId="agencia">
             <Form.Label>Agência</Form.Label>
@@ -214,136 +337,452 @@ const Pedido = () => {
         <Col></Col>
         <Col></Col>
         <Col></Col>
+      </Row> */}
+      <Row>
+        <Col>
+          <h4>Em Análise</h4>
+          <CustomTable pedidos={pedidos} tipo="ANALISE" />
+        </Col>
       </Row>
       <Row>
         <Col>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Prefixo</th>
-                <th>Nome</th>
-                <th>MCI</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pedidos.length > 0 ? pedidos.map((pedido, index) => (
-                <tr key={index}>
-                  <td>{pedido.id}</td>
-                  <td>{pedido.prefixo}</td>
-                  <td>{pedido.cliente}</td>
-                  <td>{pedido.mci}</td>
-                </tr>
-              )):<tr><td>Nenhum pedido encontrado para sua agência.</td></tr>}
-            </tbody>
-          </Table>
+          <h4>Aguardando Recurso</h4>
+          <CustomTable pedidos={pedidos} tipo="ESPERA" />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <h4>Solicitação de Prorrogação</h4>
+          <CustomTable pedidos={pedidos} tipo="ESPERA" prorrogacao />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <h4>Pedidos Autorizados</h4>
+          <CustomTable pedidos={pedidos} tipo="AUTORIZADO" />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <h4>Pedidos Recusados</h4>
+          <CustomTable pedidos={pedidos} tipo="EXCLUIDO" />
         </Col>
       </Row>
     </Container>
-    /*<div id="app">
-     <div className="container-fluid">
-      <asider>
-        <div className="row-fluid alert alert-warning">
-            <h4>BB Custeio e PRONAMP Custeio</h4>
-            <div className="text-justify">
-                <p>A fonte de recurso para as linhas BB Custeio  e PRONAMP Custeio foi alterada.</p>
-                <p>Para mais informações, consultar a IN 607-1 item 2.3.3</p>
-            </div>
-        </div>
-        <div className="row-fluid alert alert-warning">
-          <h4>Prorrogação FCO Rural</h4>
-          <div className="text-justify">
-              <p>Para as propostas com a fonte de recurso FCO, somente é permitida 
-              a solicitação de prorogação de prazo para datas dentro do 
-              mês vigente da proposta. Para solicitar um prazo superior ao 
-              permitido pela Super GO, você deve cadastrar um novo pedido com os 
-              mesmos dados do anterior. Isso é feito da seguinte maneira:</p>
-              <ul>
-                  <li>
-                      Clique no botão Prorrogação (verde) ao lado do pedido
-                  autorizado. Você será redirecionado à página de pedidos
-                  de prorrogação.
-                  </li>
-                  <li>
-                      <strong>Não preencha o formulário na página.</strong> 
-                      Apenas clique no botão laranja "Prorrogação FCO".
-                  </li>
-              </ul>
-              <p>Ao clicar no botão laranja, o pedido autorizado será automaticamente 
-              classificado como VENCIDO, e um novo pedido com os dados do anterior
-              e referente à  mesma proposta ficará em análise na Super GO.</p>
-          </div>
-        </div>
-      </asider>
-      <main>
-        <strong> Cadastrar Pedido </strong>
-
-        <form>
-          <div className="input-block">
-            <label thmlFor="cliente">Nome</label>
-            <input name="cliente" id="cliente" required />
-          </div>
-          <div className="input-block">
-            <label thmlFor="mci">MCI</label>
-            <input name="mci" id="mci" required />
-          </div>
-          <div className="input-block">
-            <label thmlFor="nr_proposta">Nr da Proposta COP</label>
-            <input name="nr_proposta" id="nr_proposta" required />
-          </div>
-          <div className="input-block">
-            <label thmlFor="valor">Valor do Pedido</label>
-            <input name="valor" id="valor" required />
-          </div>
-          <div className="input-block">
-            <label thmlFor="municipio">Município de Localização do Empreendimento</label>
-            <input name="municipio" id="municipio" required />
-          </div>
-          <div className="input-block">
-            <label thmlFor="Estado">Estado</label>
-            <select id="Estado" name="Estado" required>
-              <option value="AC">Acre - AC</option>
-              <option value="AL">Alagoas - AL</option>
-              <option value="AP">Amapá - AP </option>
-              <option value="AM">Amazonas - AM </option>
-              <option value="BA">Bahia - BA </option>
-              <option value="CE">Ceará - CE</option>
-              <option value="DF">Distrito Federal - DF</option>
-              <option value="ES">Espírito Santo - ES</option>
-              <option value="GO">Goiás - GO</option>
-              <option value="MA">Maranhão - MA</option>
-              <option value="MT">Mato Grosso - MT</option>
-              <option value="MS">Mato Grosso do Sul - MS</option>
-              <option value="MG">Minas Gerais - MG</option>
-              <option value="PA">Pará - PA </option>
-              <option value="PB">Paraíba - PB</option>
-              <option value="PR">Paraná - PR</option>
-              <option value="PE">Pernambuco - PE</option>
-              <option value="PI">Piauí - PI</option>
-              <option value="RJ">Rio de Janeiro - RJ</option>
-              <option value="RN">Rio Grande do Norte - RN</option>
-              <option value="RS">Rio Grande do Sul - RS</option>
-              <option value="RO">Rondônia - RO</option>
-              <option value="RR">Roraima - RR</option>
-              <option value="SC">Santa Catarina - SC </option>
-              <option value="SP">São Paulo - SP</option>
-              <option value="SE">Sergipe - SE</option>
-              <option value="TO">Tocantins - TO</option>
-          </select>
-          </div>
-          <div className="class-button"> 
-            <Button variant="primary" type="submit">ADICIONAR PEDIDO</Button>
-          </div>  
-        </form>
-        <lu>
-          <li>
-
-          </li>
-        </lu>
-      </main>
-     </div>
-   </div>*/
   );
 };
 
 export default Pedido;
+// <%--
+//     Document   : AdministrarAgro
+//     Created on : 31/03/2014, 08:36:40
+//     Alterado em : 09/07/2015 por Diogo Oliveira
+//     Author     : Augusto
+// --%>
+
+// <%@include file="/novoAgro/views/main_pages/header.jsp" %>
+//     <script>
+//         function moeda(z) {
+//             v = z.value;
+//             v = v.replace(/\D/g, "");  //permite digitar apenas números
+//             v = v.replace(/[0-9]{12}/, "inválido");   //limita pra máximo 999.999.999,99
+//             v = v.replace(/(\d{1})(\d{8})$/, "$1.$2");  //coloca ponto antes dos últimos 8 digitos
+//             v = v.replace(/(\d{1})(\d{5})$/, "$1.$2");  //coloca ponto antes dos últimos 5 digitos
+//             v = v.replace(/(\d{1})(\d{1,2})$/, "$1,$2");    //coloca virgula antes dos últimos 2 digitos
+//             z.value = v;
+//         }
+
+//         function verifica() {
+//             if (document.getElementById("fonteRecurso").value !== '' && document.getElementById("nome").value !== '' && document.getElementById("mci").value !== '' && document.getElementById("numeroProposta").value !== '' && document.getElementById("valor").value !== '' && document.getElementById("municipio").value !== '') {
+//                 document.form_desembolso.submit();
+//                 alert("Pedido de Desembolso submetido com SUCESSO!");
+//             } else {
+//                 alert("Preencha todos os campos.");
+//             }
+//         }
+//     </script>
+// </head>
+// <body>
+//     <%@include file="/novoAgro/views/main_pages/navbar.jsp" %>
+//     <%@include file="/novoAgro/views/main_pages/cabecalho_relatorio.jsp" %>
+//     <div class="container-fluid"><br>
+
+//             <div class="row-fluid alert alert-warning">
+//                 <h4>BB Custeio e PRONAMP Custeio</h4>
+//                 <div class="text-justify">
+//                     <p>A fonte de recurso para as linhas BB Custeio  e PRONAMP Custeio foi alterada.<br>
+//                     Para mais informações, consultar a IN 607-1 item 2.3.3</p>
+//                 </div>
+//             </div>
+
+//             <div class="row-fluid alert alert-warning">
+//                 <h4>Prorrogação FCO Rural</h4>
+//                 <div class="text-justify">
+//                     <p>Para as propostas com a fonte de recurso FCO, somente é permitida
+//                     a solicitação de prorogação de prazo para datas dentro do
+//                     mês vigente da proposta. Para solicitar um prazo superior ao
+//                     permitido pela Super GO, você deve cadastrar um novo pedido com os
+//                     mesmos dados do anterior. Isso é feito da seguinte maneira:</p>
+//                     <ul>
+//                         <li>
+//                             Clique no botão Prorrogação (verde) ao lado do pedido
+//                         autorizado. Você será redirecionado à página de pedidos
+//                         de prorrogação.
+//                         </li>
+//                         <li>
+//                             <strong>Não preencha o formulário na página.</strong>
+//                             Apenas clique no botão laranja "Prorrogação FCO".
+//                         </li>
+//                     </ul>
+//                     <p>Ao clicar no botão laranja, o pedido autorizado será automaticamente
+//                     classificado como VENCIDO, e um novo pedido com os dados do anterior
+//                     e referente à  mesma proposta ficará em análise na Super GO.</p>
+//                     </p>
+//                 </div>
+//             </div>
+
+//             <!-- Novo Pedido -->
+//             <div class="row-fluid">
+//                 <div class="page-header">
+//                     <h4><span class="glyphicon glyphicon-plus-sign"></span> Novo Pedido</h4>
+//                 </div>
+//                 <c:if test="${MsgJaAlerta!=null}">
+//                     <div class="text-center" style="color: orange;">
+//                         ${MsgJaAlerta}
+//                     </div>
+//                 </c:if>
+//                 <c:if test="${MsgSucesso!=null}">
+//                     <div class="text-center" style="color: green;">
+//                         ${MsgSucesso}
+//                     </div>
+//                 </c:if><br>
+//                 <form class="form-horizontal row" method="post" action="/PedidosDesembolso.bb" id="form_desembolso1" name="form_desembolso">
+
+//                     <div class="form-group">
+//                          <input type="hidden" name="prefixo" id="prefixo" value="${prefixo}"/>
+//                          <label class="control-label col-md-4" for="nome">Nome</label>
+//                          <div class="col-md-6">
+//                              <input type="text" id="nome" name="nome" placeholder=""  onkeyup="this.value = this.value.toUpperCase()" class="form-control" required="">
+//                          </div>
+//                      </div>
+//                      <div class="form-group">
+//                          <label class="control-label col-md-4" for="mci">MCI</label>
+//                          <div class="col-md-6">
+//                              <input type="text" id="mci" name="mci" placeholder=""  onkeyup="this.value = this.value.toUpperCase();
+//                                      this.value = this.value.replace(/[^\d]/, '')" class="form-control" required="">
+//                          </div>
+//                      </div>
+//                      <div class="form-group">
+//                          <label class="control-label col-md-4" for="numeroProposta">Nº da Proposta COP</label>
+//                          <div class="col-md-6">
+//                              <input type="text" id="numeroProposta" name="numeroProposta" placeholder="" onkeyup="this.value = this.value.replace(/[^\d]/, '')" class="form-control" required="">
+//                          </div>
+//                      </div>
+//                      <div class="form-group">
+//                          <label class="control-label col-md-4" for="valor">Valor do pedido (limitado ao valor COP)</label>
+//                          <div class="col-md-6">
+//                              <div class="input-group">
+//                                  <div class="input-group-addon">R$</div>
+//                                  <input type="text" id="valor" name="valor" placeholder="" onkeyup="moeda(this)" class="form-control" required="">
+//                              </div>
+//                          </div>
+//                      </div>
+//                       <div class="form-group">
+//                          <label class="control-label col-md-4" for="municipio">Município de localização do empreendimento</label>
+//                          <div class="col-md-6">
+//                              <input type="text" id="municipio" name="municipio" placeholder="" value="${listaInfoPedido.municipio}" onkeyup="this.value = this.value.toUpperCase()" class="form-control" required="">
+//                          </div>
+//                      </div>
+//                      <div class="form-group">
+//                          <label class="control-label col-md-4" for="estado">Estado</label>
+//                          <div class="col-md-6">
+//                              <select id="estado" name="estado" class="form-control">
+//                                      <option value="AC">Acre - AC</option>
+//                                      <option value="AL">Alagoas - AL</option>
+//                                      <option value="AP">Amapá - AP </option>
+//                                      <option value="AM">Amazonas - AM </option>
+//                                      <option value="BA">Bahia - BA </option>
+//                                      <option value="CE">Ceará - CE</option>
+//                                      <option value="DF">Distrito Federal - DF</option>
+//                                      <option value="ES">Espírito Santo - ES</option>
+//                                      <option value="GO">Goiás - GO</option>
+//                                      <option value="MA">Maranhão - MA</option>
+//                                      <option value="MT">Mato Grosso - MT</option>
+//                                      <option value="MS">Mato Grosso do Sul - MS</option>
+//                                      <option value="MG">Minas Gerais - MG</option>
+//                                      <option value="PA">Pará - PA </option>
+//                                      <option value="PB">Paraíba - PB</option>
+//                                      <option value="PR">Paraná - PR</option>
+//                                      <option value="PE">Pernambuco - PE</option>
+//                                      <option value="PI">Piauí - PI</option>
+//                                      <option value="RJ">Rio de Janeiro - RJ</option>
+//                                      <option value="RN">Rio Grande do Norte - RN</option>
+//                                      <option value="RS">Rio Grande do Sul - RS</option>
+//                                      <option value="RO">Rondônia - RO</option>
+//                                      <option value="RR">Roraima - RR</option>
+//                                      <option value="SC">Santa Catarina - SC </option>
+//                                      <option value="SP">São Paulo - SP</option>
+//                                      <option value="SE">Sergipe - SE</option>
+//                                      <option value="TO">Tocantins - TO</option>
+//                              </select>
+//                          </div>
+//                      </div>
+//                      <div class="form-group">
+//                          <label class="control-label col-md-4" for="fonteRecurso">Fonte do Recurso</label>
+//                          <div class="col-md-6">
+//                              <select id="fonteRecurso" name="fonteRecurso" class="form-control">
+//                                  <option value="">...</option>
+//                                  <option value="FCO">FCO</option>
+//                                  <option value="MCR 6.2 Controlado">MCR 6.2 Controlado</option>
+//                                  <option value="MCR 6.4 - Poupanca-Ouro Controlada">MCR 6.4 - Poupança-Ouro Controlada</option>
+//                                  <option value="MCR 6.4 - Poupanca-Ouro Nao Controlada">MCR 6.4 - Poupança-Ouro Não Controlada</option>
+//                              </select>
+//                          </div>
+//                      </div>
+//                      <div class="form-group">
+//                          <!--
+//                          <div class="center-block">
+//                              <label class="control-label col-md-4" for="fco_prorrogacao">Prorrogação FCO</label>
+//                              <div class="col-md-6">
+//                              <input type="checkbox" name="fco_prorrogacao" value="sim">
+//                              </div>
+//                          </div>
+//                          -->
+//                      </div>
+//                       <div class="form-group">
+//                          <label class="col-md-4" for="enviar"></label>
+//                          <div class="col-md-6">
+//                              <input type="hidden" value="Adicionar" name="adicionar">
+//                              <button id="enviar" name="enviar" class="btn btn-primary center-block">Adicionar</button>
+//                          </div>
+//                      </div>
+//                  </form>
+//             </div>
+//             <!-- Fim Novo Pedido -->
+
+//         <c:choose>
+//             <c:when test="${mesngemErro!=null}">
+//                 <h3><strong>${mesngemErro}</strong></h3>
+//             </c:when>
+//             <c:otherwise>
+//                 <div class="row-fluid">
+//                     <div class="page-header">
+//                         <h4><span class="glyphicon glyphicon-pencil"></span> Em Análise</h4>
+//                     </div>
+//                     <div class="panel-body">
+//                         <c:if test="${empty listaPedidosANALISE}">
+//                             <p class="text-center">Nenhum pedido</p>
+//                         </c:if>
+//                         <c:if test="${not empty listaPedidosANALISE}">
+//                             <table class="table-agro table table-hover table-striped"
+//                                    data-toggle="table" data-url="data1.json" data-cache="false"
+//                                    data-height="400">
+//                                 <thead>
+//                                     <tr>
+//                                         <c:if test="${mostraPrefixos!=null}">
+//                                             <th data-field="Prefixo">Prefixo</th>
+//                                             <th data-field="dependencia">Dependência</th>
+//                                             </c:if>
+//                                         <th data-field="cliente">Cliente</th>
+//                                         <th data-field="nproposta">Nr. Proposta</th>
+//                                         <th data-field="valorsolic">Valor Solicitado</th>
+//                                         <th data-field="municipio">Município</th>
+//                                         <th data-field="acoes"></th>
+//                                     </tr>
+//                                 </thead>
+//                                 <tbody>
+//                                     <c:forEach var="listaPedidosANALISE" items="${listaPedidosANALISE}">
+//                                         <tr>
+//                                             <c:if test="${mostraPrefixos!=null}">
+//                                                 <td>${listaPedidosANALISE.prefixo}</td>
+//                                                 <td>${listaPedidosANALISE.dependencia}</td>
+//                                             </c:if>
+//                                             <td>${listaPedidosANALISE.cliente}</td>
+//                                             <td>${listaPedidosANALISE.nr_proposta}</td>
+//                                             <td>${listaPedidosANALISE.valor_string}</td>
+//                                             <td>${listaPedidosANALISE.municipio}</td>
+//                                             <td>
+//                                                 <form class="form-inline" method="POST" action="/PedidosDesembolso.bb" onsubmit="alert('Pedido excluído com sucesso!')">
+//                                                     <input type="hidden" name="cod_pedido" value="${listaPedidosANALISE.cod_pedido}" />
+//                                                     <input class="btn-danger" type="submit" name="excluir" value="Excluir"/>
+//                                                 </form>
+//                                             </td>
+//                                         </tr>
+//                                     </c:forEach>
+//                                 </tbody>
+//                             </table>
+//                         </c:if>
+//                     </div>
+//                 </div>
+
+//                 <div class="row-fluid">
+//                     <div class="page-header">
+//                         <h4><span class="fa fa-fw fa-hourglass-half"></span> Aguardando recurso</h4>
+//                     </div>
+//                     <div class="panel-body">
+//                           <c:if test="${empty listaPedidosESPERA}">
+//                             <p class="text-center">Nenhum pedido</p>
+//                         </c:if>
+//                         <c:if test="${not empty listaPedidosESPERA}">
+//                             <table class="table table-agro table-hover table-striped"
+//                                    data-toggle="table" data-url="data1.json" data-cache="false"
+//                                    data-height="400">
+//                                 <thead>
+//                                     <tr>
+//                                         <c:if test="${mostraPrefixos!=null}">
+//                                             <th data-field="Prefixo">Prefixo</th>
+//                                             <th data-field="Dependência">Dependência</th>
+//                                             </c:if>
+//                                         <th data-field="Cliente">Cliente</th>
+//                                         <th data-field="Proposta">Nr. Proposta</th>
+//                                         <th data-field="Valor">Valor</th>
+//                                         <th data-field="Município">Município</th>
+//                                         <th data-field="Linha">Fonte do recurso</th>
+//                                         <th data-field="Linha">Linha COP</th>
+//                                         <th data-field="Excluir"></th>
+//                                     </tr>
+//                                 </thead>
+//                                 <tbody>
+//                                     <c:forEach var="listaPedidosESPERA" items="${listaPedidosESPERA}">
+//                                         <tr>
+//                                             <c:if test="${mostraPrefixos!=null}">
+//                                                 <td style="width: 60px;">${listaPedidosESPERA.prefixo}</td>
+//                                                 <td>${listaPedidosESPERA.dependencia}</td>
+//                                             </c:if>
+//                                             <td>${listaPedidosESPERA.cliente}</td>
+//                                             <td style="width: 100px;">${listaPedidosESPERA.nr_proposta}</td>
+//                                             <td style="width: 100px;">${listaPedidosESPERA.valor_string}</td>
+//                                             <td>${listaPedidosESPERA.municipio}</td>
+//                                             <td>${listaPedidosESPERA.fonte_recurso}</td>
+//                                             <td>${listaPedidosESPERA.linha_cop}</td>
+//                                             <td>
+//                                                 <c:if test="${mostraPrefixos!=null}">
+//                                                 <form class="form-inline" method="POST" action="/PedidosDesembolso.bb" onsubmit="alert('Pedido excluído com sucesso!')">
+//                                                     <input type="hidden" name="cod_pedido" value="${listaPedidosESPERA.cod_pedido}" />
+//                                                     <input class="btn-warning center-block" type="submit" name="excluir_espera" value="Recusar"/>
+//                                                         <select style="width: 200px;" class="center-block"  id="motivo_exclusao" name="motivo_exclusao" class="form-control">
+//                                                             <option value="Sem valor">...</option>
+//                                                             <option value="Número da proposta incorreto">Número da proposta incorreto</option>
+//                                                             <option value="Valor COP Excedido">Valor COP Excedido</option>
+//                                                             <option value="Fonte de recursos incorreta">Fonte de recursos incorreta</option>
+//                                                             <option value="Pedido duplicado">Pedido duplicado</option>
+//                                                             <option value="Prazo expirado">Prazo expirado</option>
+//                                                             <option value="Sem necessidade de solicitação da Super Goiás para esta linha de crédito">Sem necessidade de solicitação da Super Goiás para esta linha de crédito</option>
+//                                                             <option value="OUTRO">Outro</option>
+//                                                         </select>
+//                                                 </form>
+//                                                 </c:if>
+//                                                 <c:if test="${mostraPrefixos==null}">
+//                                                 <form class="form-inline" method="POST" action="/PedidosDesembolso.bb" onsubmit="alert('Pedido excluído com sucesso!')">
+//                                                     <input type="hidden" name="cod_pedido" value="${listaPedidosESPERA.cod_pedido}" />
+//                                                     <input class="btn-danger" type="submit" name="excluir" value="Excluir"/>
+//                                                 </form>
+//                                                 </c:if>
+//                                             </td>
+//                                         </tr>
+//                                     </c:forEach>
+//                                 </tbody>
+//                             </table>
+//                         </c:if>
+//                     </div>
+//                 </div>
+
+//                 <c:if test="${prefixo != 8486}">
+//                     <div class="row-fluid">
+//                         <div class="page-header">
+//                             <h4><span class="fa fa-fw fa-ban"></span> Recusados</h4>
+//                         </div>
+//                         <div class="panel-body">
+//                             <c:if test="${empty listaPedidosEXCLUIDO}">
+//                                 <p class="text-center">Nenhum pedido</p>
+//                             </c:if>
+//                             <c:if test="${not empty listaPedidosEXCLUIDO}">
+//                                 <table class="table table-agro table-hover table-striped"
+//                                        data-toggle="table" data-url="data1.json" data-cache="false" data-height="400">
+//                                     <thead>
+//                                         <tr>
+//                                             <th data-field="Cliente">Cliente</th>
+//                                             <th data-field="Proposta">Nr. Proposta</th>
+//                                             <th data-field="Valor">Valor</th>
+//                                             <th data-field="Município">Município</th>
+//                                             <th data-field="Linha">Linha COP</th>
+//                                             <th data-field="Motivo">Motivo da Recusa</th>
+//                                         </tr>
+//                                     </thead>
+//                                     <tbody>
+//                                         <c:forEach var="listaPedidosEXCLUIDO" items="${listaPedidosEXCLUIDO}">
+//                                             <tr>
+//                                                 <td>${listaPedidosEXCLUIDO.cliente}</td>
+//                                                 <td>${listaPedidosEXCLUIDO.nr_proposta}</td>
+//                                                 <td>${listaPedidosEXCLUIDO.valor_string}</td>
+//                                                 <td>${listaPedidosEXCLUIDO.municipio}</td>
+//                                                 <td>${listaPedidosEXCLUIDO.linha_cop}</td>
+//                                                 <td>${listaPedidosEXCLUIDO.motivo_exclusao}</td>
+//                                             </tr>
+//                                         </c:forEach>
+//                                     </tbody>
+//                                 </table>
+//                             </c:if>
+//                         </div>
+//                      </div>
+
+//                     <div class="row-fluid">
+//                         <div class="page-header">
+//                             <h4><span class="fa fa-fw fa-check-circle"></span> Autorizados</h4>
+//                         </div>
+
+//                         <c:if test="${empty listaPedidosAUTORIZADO}">
+//                             <p class="text-center">Nenhum pedido</p>
+//                         </c:if>
+//                         <c:if test="${not empty listaPedidosAUTORIZADO}">
+//                             <table class="table table-agro table-hover table-striped"
+//                                    data-toggle="table" data-url="data1.json" data-cache="false"
+//                                    data-height="400">
+//                                 <thead>
+//                                     <tr>
+//                                         <c:if test="${mostraPrefixos!=null}">
+//                                             <th data-field="Prefixo">Prefixo</th>
+//                                             <th data-field="Dependência">Dependência</th>
+//                                         </c:if>
+//                                         <th data-field="Cliente">Cliente</th>
+//                                         <th data-field="Proposta">Nr. Proposta</th>
+//                                         <th data-field="Valor">Valor</th>
+//                                         <th data-field="Município">Município</th>
+//                                         <th data-field="Linha">Linha COP</th>
+//                                         <th data-field="Correio">Correio</th>
+//                                         <th data-field="Autorizado">Autorizado Até</th>
+//                                         <th></th>
+//                                     </tr>
+//                                 </thead>
+//                                 <tbody>
+//                                     <c:forEach var="listaPedidosAUTORIZADO" items="${listaPedidosAUTORIZADO}">
+//                                         <tr>
+//                                             <c:if test="${mostraPrefixos!=null}">
+//                                                 <td>${listaPedidosAUTORIZADO.prefixo}</td>
+//                                                 <td>${listaPedidosAUTORIZADO.dependencia}</td>
+//                                             </c:if>
+//                                             <td>${listaPedidosAUTORIZADO.cliente}</td>
+//                                             <td style="width: 100px;">${listaPedidosAUTORIZADO.nr_proposta}</td>
+//                                             <td style="width: 120px;">${listaPedidosAUTORIZADO.valor_string}</td>
+//                                             <td>${listaPedidosAUTORIZADO.municipio}</td>
+//                                             <td>${listaPedidosAUTORIZADO.linha_cop}</td>
+//                                             <td>${listaPedidosAUTORIZADO.correio_autorizacao}</td>
+//                                             <td style="width: 110px;"><fmt:formatDate pattern="dd/MM/yyyy" value="${listaPedidosAUTORIZADO.aut_ate}" /></td>
+//                                             <td>
+//                                                 <form method="POST" action="/PedidosDesembolso.bb" >
+//                                                     <input type="hidden" name="cod_pedido" value="${listaPedidosAUTORIZADO.cod_pedido}" />
+//                                                     <input class="btn-success" type="submit" name="editar" value="Prorrogação"/>
+//                                                 </form>
+//                                             </td>
+//                                         </tr>
+//                                     </c:forEach>
+//                                 </tbody>
+//                             </table>
+//                         </c:if>
+//                     </div>
+//                 </c:if>
+//            </c:otherwise>
+//         </c:choose>
+//     </div>
+// </body>
+// </html>

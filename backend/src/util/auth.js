@@ -27,6 +27,7 @@ module.exports = {
       }
       req.matricula = decoded.matricula;
       req.prefixo = decoded.prefixo;
+      
       cb();
     });
   },

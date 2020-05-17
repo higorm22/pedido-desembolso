@@ -16,6 +16,19 @@ const index = async (req, res) => {
   }
 };
 
+const findById = async (req,res) =>{
+  const id = req.params.id;
+  try {
+    const pedido = await Pedido.findByPk(id);
+
+    return res.status(200).json(pedido);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message, error: error });
+  }
+
+}
+
 const validate = (dbPedido, res) => {
   //The proposal already exists
   if (dbPedido) {
@@ -101,6 +114,9 @@ const del = async (req, res) => {
 module.exports = {
   index(req, res) {
     index(req, res);
+  },
+  findById(req, res) {
+    findById(req, res);
   },
   store(req, res) {
     store(req, res);
