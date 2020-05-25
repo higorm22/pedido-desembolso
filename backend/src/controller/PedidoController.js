@@ -16,7 +16,7 @@ const index = async (req, res) => {
   }
 };
 
-const findById = async (req,res) =>{
+const findById = async (req, res) => {
   const id = req.params.id;
   try {
     const pedido = await Pedido.findByPk(id);
@@ -25,22 +25,6 @@ const findById = async (req,res) =>{
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: error.message, error: error });
-  }
-
-}
-
-const validate = (dbPedido, res) => {
-  //The proposal already exists
-  if (dbPedido) {
-    if (dbPedido.status !== "EXCLUIDO") {
-      return res.status(400).json({
-        message:
-          "Pedido já existe com No. da Proposta " +
-          dbPedido.nr_proposta +
-          " e situação " +
-          dbPedido.status,
-      });
-    }
   }
 };
 
@@ -55,11 +39,26 @@ const store = async (req, res) => {
       order: [["createdAt", "DESC"]],
     });
 
-    validate(dbPedido, res);
+    if (dbPedido) {
+      if (dbPedido.status !== "EXCLUIDO") {
+        return res.status(400).json({
+          message:
+            "Pedido já existe com No. da Proposta " +
+            dbPedido.nr_proposta +
+            " e situação " +
+            dbPedido.status,
+        });
+      }
+    }
 
     //Create new proposal
     pedido = await Pedido.create(req.body);
-    return res.status(200).json({message:'Pedido criado com sucesso!'});
+    return res
+      .status(200)
+      .json({
+        message: "Pedido criado com sucesso!",
+        messageFco: "Prorrogação realizado com sucesso!",
+      });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: error.message, error: error });
@@ -68,7 +67,7 @@ const store = async (req, res) => {
 
 const update = async (req, res) => {
   let pedido = req.body;
-
+  console.log("Pedido: ", pedido.id);
   try {
     //Find the order by your ID
     let dbPedido = await Pedido.findByPk(pedido.id);

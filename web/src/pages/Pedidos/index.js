@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import ls from "local-storage";
-import InputMask from "react-input-mask";
 import {
   Button,
   Row,
@@ -10,12 +9,12 @@ import {
   Nav,
   Navbar,
   Alert,
-  Table,
   Image,
 } from "react-bootstrap";
 
 import MaskedInput from "../../components/masked-input";
 import CustomTable from "../../components/custom-table";
+import Informacoes from "../../components/info";
 import Axios from "../../services";
 import { parseStringMoneyToDouble } from "../../util/format";
 import logo from "../../assets/images/logo.png";
@@ -24,39 +23,15 @@ import "./styles.css";
 
 const Pedido = () => {
   const INITIAL_STATE = {
-    regional: 0,
+    regional: 8829,
     prefixo: 0,
-    dependencia: "",
     cliente: "",
+    mci: "",
     nr_proposta: 0,
     valor: 0.0,
     municipio: "",
-    cliente_cop: "",
-    valor_cop: 0,
-    operacao_cop: 0,
-    situacao_cop: "DESPACHADA-DEFERIDA",
-    correio_autorizacao: "2020/0000002",
-    linha_cop: "0219 - FCO",
     status: "ANALISE",
-    aut: false,
-    mci: 0,
-    mci_cop: 0,
-    fonte_recurso: "",
-    ride: "",
-    area_atuacao: "",
-    devolucao: "",
-    cartao: 0,
-    data_autorizacao: "",
-    data_cadastro: "",
     estado: "",
-    motivo_exclusao: "",
-    data_acolhimento: "",
-    taxa_juros: 0,
-    data_despacho: "",
-    data_formalizacao: "",
-    prefixo_op: 0,
-    prorrogrado: false,
-    matricula: "",
   };
 
   const [pedidos, setPedidos] = useState([]);
@@ -106,6 +81,9 @@ const Pedido = () => {
       Authorization: token,
     })
       .then((response) => {
+
+        loadPedidos();
+
         setStatus({ type: "success", message: response.data.message });
       })
       .catch((error) => {
@@ -131,60 +109,24 @@ const Pedido = () => {
         </Navbar>
       </Row>
       <p>&nbsp;</p>
-      <Col>
-        <Row>
-          <h4>BB Custeio e PRONAMP Custeio</h4>
-        </Row>
-        <Row className="text-justify">
-          <p>
-            A fonte de recurso para as linhas BB Custeio e PRONAMP Custeio foi
-            alterada.
-          </p>
-          <p>Para mais informações, consultar a IN 607-1 item 2.3.3</p>
-        </Row>
-        <p>&nbsp;</p>
-        <Row>
-          <h4>Prorrogação FCO Rural</h4>
-        </Row>
-        <Row className="text-justify">
-          <p>
-            Para as propostas com a fonte de recurso FCO, somente é permitida a
-            solicitação de prorogação de prazo para datas dentro do mês vigente
-            da proposta. Para solicitar um prazo superior ao permitido pela
-            Super GO, você deve cadastrar um novo pedido com os mesmos dados do
-            anterior. Isso é feito da seguinte maneira:
-          </p>
-          <ul>
-            <li>
-              Clique no botão Prorrogação (verde) ao lado do pedido autorizado.
-              Você será redirecionado à página de pedidos de prorrogação.
-            </li>
-            <li>
-              <strong>Não preencha o formulário na página.</strong>
-              Apenas clique no botão laranja "Prorrogação FCO".
-            </li>
-          </ul>
-          <p>
-            Ao clicar no botão laranja, o pedido autorizado será automaticamente
-            classificado como VENCIDO, e um novo pedido com os dados do anterior
-            e referente à  mesma proposta ficará em análise na Super GO.
-          </p>
-        </Row>
-      </Col>
+      <Informacoes />
       <p>&nbsp;</p>
       <Row>
-        <Col>
+        <Col></Col>
+        <Col xs={6}>
           <h4>Cadastrar Pedidos</h4>
         </Col>
+        <Col></Col>
       </Row>
       <Row>
-        <Col>
+        <Col></Col>
+        <Col xs={6}>
           {status ? (
             <Col className="text-center">
               <Alert variant={status.type}>{status.message}</Alert>
             </Col>
           ) : null}
-          <Col md={6}>
+          <Col>
             <Form onSubmit={handleSubmit}>
               {/* INPUT */}
               <Form.Group controlId="nomeCliente">
@@ -202,7 +144,7 @@ const Pedido = () => {
               {/* INPUT */}
 
               <Row>
-                <Col md={6}>
+                <Col>
                   {/* INPUT */}
                   <Form.Group controlId="mci">
                     <Form.Label>MCI</Form.Label>
@@ -219,7 +161,7 @@ const Pedido = () => {
                   </Form.Group>
                   {/* INPUT */}
                 </Col>
-                <Col md={6}>
+                <Col>
                   {/* INPUT */}
                   <Form.Label>No. da Proposta</Form.Label>
 
@@ -237,22 +179,25 @@ const Pedido = () => {
                 </Col>
               </Row>
               <Row>
-                <Col md={6}>
+                <Col>
                   {/*INPUT*/}
                   <Form.Label>Valor</Form.Label>
                   <MaskedInput
                     name="valor"
-                    isReverse={true}
-                    maskString={"#.##0,00"}
+                    // isReverse
+                    // maskString={"#.##0,00"}
+                    // maskString={"0#"}
+                    // maskString={"000.000.000.000.000,00"}
                     placeholder="0,00"
-                    onChange={(e) =>
-                      setPedido({ ...pedido, valor: e.target.value })
-                    }
+                    onChange={(e) => {
+                      console.log(e.target.value);
+                      setPedido({ ...pedido, valor: e.target.value });
+                    }}
                     value={pedido.valor}
                   />
                   <p>&nbsp;</p>
                 </Col>
-                <Col md={6}>
+                <Col>
                   {/*INPUT*/}
                   <Form.Label>Município do Empreendimento</Form.Label>
                   <Form.Control
@@ -266,7 +211,7 @@ const Pedido = () => {
                 </Col>
               </Row>
               <Row>
-                <Col md={6}>
+                <Col>
                   {/*INPUT*/}
                   <Form.Label>Estado</Form.Label>
                   <Form.Control
@@ -319,52 +264,46 @@ const Pedido = () => {
             </Form>
           </Col>
         </Col>
+        <Col></Col>
       </Row>
       <p>&nbsp;</p>
-      {/* <Row>
-        <Col>
-          <Form.Group controlId="agencia">
-            <Form.Label>Agência</Form.Label>
-            <Form.Control as="select">
-              {agencias.map((agencia) => (
-                <option key={agencia.prefixo} value="{agencia.prefixo}">
-                  {agencia.prefixo} - {agencia.dependencia}
-                </option>
-              ))}
-            </Form.Control>
-          </Form.Group>
-        </Col>
-        <Col></Col>
-        <Col></Col>
-        <Col></Col>
-      </Row> */}
       <Row>
         <Col>
-          <h4>Em Análise</h4>
+          <Alert variant="success">
+            <h4>Em Análise</h4>
+          </Alert>
           <CustomTable pedidos={pedidos} tipo="ANALISE" />
         </Col>
       </Row>
       <Row>
         <Col>
-          <h4>Aguardando Recurso</h4>
+          <Alert variant="success">
+            <h4>Aguardando Recurso</h4>
+          </Alert>
           <CustomTable pedidos={pedidos} tipo="ESPERA" />
         </Col>
       </Row>
       <Row>
         <Col>
-          <h4>Solicitação de Prorrogação</h4>
+          <Alert variant="success">
+            <h4>Solicitação de Prorrogação</h4>
+          </Alert>
           <CustomTable pedidos={pedidos} tipo="ESPERA" prorrogacao />
         </Col>
       </Row>
       <Row>
         <Col>
-          <h4>Pedidos Autorizados</h4>
+          <Alert variant="success">
+            <h4>Pedidos Autorizados</h4>
+          </Alert>
           <CustomTable pedidos={pedidos} tipo="AUTORIZADO" />
         </Col>
       </Row>
       <Row>
         <Col>
-          <h4>Pedidos Recusados</h4>
+          <Alert variant="success">
+            <h4>Pedidos Recusados</h4>
+          </Alert>
           <CustomTable pedidos={pedidos} tipo="EXCLUIDO" />
         </Col>
       </Row>

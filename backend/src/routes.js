@@ -20,7 +20,7 @@ routes.use(authMiddleware.authenticate);
 routes.get('/pedidos',PedidoController.index);
 routes.get('/pedidos/:id',PedidoController.findById);
 routes.post('/pedidos',PedidoController.store);
-routes.put('/pedidos',PedidoController.update);
+routes.put('/pedidos/:id',PedidoController.update);
 routes.delete('/pedidos',PedidoController.delete);
 
 //Agências

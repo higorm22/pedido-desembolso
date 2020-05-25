@@ -8,15 +8,20 @@ module.exports = {
         return res.status(200).json(alteracoespedido);
     },
     async store(req, res) {
-        let alteracaopedido = await AlteracaoPedido.create(req.body);
-
-        let alteracaoDoPedidoComVinculacoes = await AlteracaoPedido.findByPk(alteracaopedido.id,{
-            include:[
-                {
-                    association:'Pedido'
-                }
-            ]
-        });
-        return res.status(200).json(alteracaoDoPedidoComVinculacoes);
+        try{
+            let alteracaopedido = await AlteracaoPedido.create(req.body);
+            
+            let alteracaoDoPedidoComVinculacoes = await AlteracaoPedido.findByPk(alteracaopedido.id,{
+                include:[
+                    {
+                        association:'Pedido'
+                    }
+                ]
+            });
+            return res.status(200).json({message:'Prorrogação solicitada com sucesso!'});
+        } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message, error: error });
+        }
     }
 }

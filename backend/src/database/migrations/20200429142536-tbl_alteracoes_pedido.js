@@ -16,18 +16,58 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "CASCADE"
       },
-      valor_anterior: Sequelize.FLOAT,
-      novo_valor: Sequelize.FLOAT,
-      prazo_anterior: Sequelize.DATE,
-      novo_prazo: Sequelize.DATE,
-      autorizado_mudanca: Sequelize.BOOLEAN,
-      data_solicitacao: Sequelize.DATE,
-      data_autorizacao: Sequelize.DATE,
-      motivo: Sequelize.STRING,
-      analizado: Sequelize.BOOLEAN,
-      correio_enviado: Sequelize.BOOLEAN,
-      numero_correio: Sequelize.STRING,
-      matricula: Sequelize.STRING,
+      valor_anterior: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      novo_valor: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      prazo_anterior: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      novo_prazo: {
+        type: Sequelize.DATE,
+        allowNull:false,
+      },
+      autorizado_mudanca: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      data_solicitacao: {
+        type: Sequelize.DATE,
+        defaultValue: new Date(),
+      },
+      data_autorizacao: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      motivo: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      analizado: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      correio_enviado: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      numero_correio: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      numero_correio_novo: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      matricula: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       createdAt: {
         type:Sequelize.DATE,
         allowNull:false,

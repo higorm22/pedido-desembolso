@@ -1,11 +1,12 @@
 import React from "react";
-import {  Table } from "react-bootstrap";
+import { Table, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { FaSearch } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
+import "./styles.css";
 
 const CustomTable = ({ pedidos, tipo, prorrogacao }) => {
   return (
-    <Table striped bordered hover>
+    <Table bordered hover  responsive="md">
       <thead>
         <tr>
           <th>Cliente</th>
@@ -23,7 +24,7 @@ const CustomTable = ({ pedidos, tipo, prorrogacao }) => {
               <tr
                 key={index}
                 style={{
-                  display: pedido.status === tipo ? "contents" : "none",
+                  display: pedido.status === tipo ? "table-row" : "none",
                 }}
               >
                 <td>{pedido.cliente}</td>
@@ -31,11 +32,18 @@ const CustomTable = ({ pedidos, tipo, prorrogacao }) => {
                 <td>{pedido.valor}</td>
                 <td>{pedido.status}</td>
                 <td>{pedido.municipio}</td>
-                {tipo === "ESPERA" && prorrogacao ? null : (
+                {tipo === "ESPERA" && pedido.prorrogado ? null : tipo ===
+                  "AUTORIZADO" ? (
                   <td>
                     <Link to={{ pathname: `/prorrogacao-pedido/` + pedido.id }}>
-                      <FaSearch />
+                      <Button variant="primary" size="sm">
+                        Prorrogação
+                      </Button>
                     </Link>
+                  </td>
+                ) : (
+                  <td>
+                      <FaTrashAlt />
                   </td>
                 )}
               </tr>

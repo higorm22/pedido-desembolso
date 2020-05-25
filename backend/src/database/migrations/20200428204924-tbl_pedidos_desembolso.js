@@ -9,18 +9,24 @@ module.exports = {
         autoIncrement: true,
         allowNull: false,
       },
-      regional: Sequelize.INTEGER,
+      regional: {
+        type:Sequelize.INTEGER,
+        allowNull: true,
+      },
       prefixo: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      dependencia: Sequelize.STRING,
+      dependencia: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       cliente: {
         type: Sequelize.STRING,
         allowNull: false,
       },
       nr_proposta: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false,
       },
       valor: {
@@ -29,47 +35,116 @@ module.exports = {
       },
       municipio: {
         type: Sequelize.STRING,
+        allowNull: false,
+      },
+      cliente_cop: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
-      cliente_cop: Sequelize.STRING,
-      valor_cop: Sequelize.FLOAT,
-      operacao_cop: Sequelize.INTEGER,
-      situacao_cop: Sequelize.STRING,
-      correio_autorizacao: Sequelize.STRING,
-      linha_cop: Sequelize.STRING,
-      status: Sequelize.STRING,
-      aut: Sequelize.BOOLEAN,
+      valor_cop: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      operacao_cop: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      situacao_cop: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      correio_autorizacao: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      linha_cop: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      status: {
+        type: Sequelize.STRING,
+        defaultValue: "ANALISE",
+      },
+      aut: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
       aut_ate: {
         type: Sequelize.DATE,
         allowNull: true,
       },
       mci: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
+        type: Sequelize.STRING,
+        allowNull: true,
       },
-      mci_cop: Sequelize.INTEGER,
-      fonte_recurso: Sequelize.STRING,
-      ride: Sequelize.STRING,
-      area_atuacao: Sequelize.STRING,
-      devolucao: Sequelize.STRING,
-      cartao: Sequelize.FLOAT,
-      data_autorizacao: Sequelize.DATE,
+      mci_cop: {
+        type: Sequelize.STRING,
+      allowNull: true,
+      },
+      fonte_recurso: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      ride: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      area_atuacao: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      devolucao: {
+        type:Sequelize.STRING,
+        allowNull: true,
+      },
+      cartao: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      data_autorizacao: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
       data_cadastro: {
         type: Sequelize.DATE,
-        allowNull: false,
+        defaultValue: new Date(),
       },
       estado: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      motivo_exclusao: Sequelize.STRING,
-      data_acolhimento: Sequelize.DATE,
-      taxa_juros: Sequelize.FLOAT,
-      data_despacho: Sequelize.DATE,
-      data_formalizacao: Sequelize.DATE,
-      prefixo_op: Sequelize.INTEGER,
-      prorrogrado: Sequelize.BOOLEAN,
-      matricula: Sequelize.STRING,
+      motivo_exclusao: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      data_acolhimento: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      taxa_juros: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      data_despacho: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      data_formalizacao: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      prefixo_op: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      prorrogado: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      matricula: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

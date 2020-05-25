@@ -1,9 +1,17 @@
 .wrapper-navbar {
-    background-color: #f0f0f0;
-    width:100%;
-  }
-  
-  .wrapper-navbar .navbar-nav a {
-    color: #f68c04 !important;
-  }
-  
+  background-color: #f0f0f0;
+  width: 100%;
+}
+
+.wrapper-navbar .navbar-nav a {
+  color: #f68c04 !important;
+}
+
+th,
+td,
+h4 {
+  text-align: center !important;
+  align-items: center !important;
+}
+
+

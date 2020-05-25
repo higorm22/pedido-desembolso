@@ -15,6 +15,7 @@ export const parseStringMoneyToDouble = (value) => {
     return 0.0;
   }
 
+  console.log(value.split('.').join(""));
   return value.split(".").join("").replace(",", ".");
 };
 

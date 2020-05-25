@@ -8,7 +8,10 @@ import {
   Nav,
   Navbar,
   Image,
+  Alert,
 } from "react-bootstrap";
+
+import { Link } from "react-router-dom";
 
 import {
   formatAmericanToBrazillianDateAndTime,
@@ -22,27 +25,101 @@ import Axios from "../../services";
 import ls from "local-storage";
 
 const ProrrogacaoPedido = ({ match }) => {
-  const [pedido, setPedido] = useState([]);
+  const INITIAL_STATE = {
+    novo_prazo: new Date(),
+    motivo: "",
+  };
+  const [pedido, setPedido] = useState({});
+  const [message, setMessage] = useState({});
+  const [messageFco, setMessageFco] = useState({});
+  const [pedidoAlterado, setPedidoAlterado] = useState(INITIAL_STATE);
 
-  const loadPedidos = async () => {
-    const id = match.params.id;
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const token = "Bearer " + ls.get("token");
 
-    Axios.get("/pedidos/" + id, {
+    await Axios.post("/alteracoes", pedidoAlterado, {
       Authorization: token,
     })
       .then((response) => {
-        setPedido(response.data);
+        setPedido({ ...pedido, prorrogado: true, status: "ESPERA" });
+
+        Axios.put(`/pedidos/${pedido.id}`, pedido, {
+          Authorization: token,
+        });
+
+        setMessage({ type: "success", message: response.data.message });
       })
       .catch((error) => {
-        console.error(error);
+        setMessage({ type: "danger", message: error.response.data.message });
+      });
+  };
+
+  const handleSubmitFco = async () => {
+    console.log("Linha: ", pedido.linha_cop);
+    if (pedido.linha_cop !== "FCO") {
+      setMessageFco({
+        type: "danger",
+        message: "Pedido não corresponde ao FCO.",
+      });
+      return;
+    }
+    const token = "Bearer " + ls.get("token");
+
+    setPedido({ ...pedido, prorrogado: true, status: "DEVOLVIDO" });
+
+    await Axios.put(`/pedidos/${pedido.id}`,pedido, {
+      Authorization: token,
+    })
+    
+      .then((response) => {
+        //setPedido(response.data);
+        setPedido({ 
+          ...pedido, 
+          prorrogado: true, 
+          status: "ESPERA", 
+          nr_proposta: pedido.data.nr_proposta,
+          cliente: pedido.data.cliente,
+          valor: pedido.data.valor,
+          mci: pedido.data.mci,
+          estado: pedido.data.estado,
+          municipio: pedido.data.municipio,
+         });
+        Axios.post("/pedidos", pedido, {
+          Authorization: token,
+        });
+        setMessageFco({ type: "success", message: response.data.message });
+      })
+      .catch((error) => {
+        //console.log("messagem erro: ", error.response.data.message  );
+        //setPedido(error.data);
+        setMessageFco({ type: "danger", message: error.response.data.message });
       });
   };
 
   useEffect(() => {
-    loadPedidos();
-  }, []);
+    async function loadData() {
+      const token = "Bearer " + ls.get("token");
+
+      if (!pedidoAlterado.motivo) {
+        const id = match.params.id;
+
+        const pedidoResponse = await Axios.get("/pedidos/" + id, {
+          Authorization: token,
+        });
+
+        setPedido(pedidoResponse.data);
+
+        setPedidoAlterado({
+          ...pedidoAlterado,
+          valor_anterior: pedidoResponse.data.valor,
+          PedidoId: pedidoResponse.data.id,
+        });
+      }
+    }
+
+    loadData();
+  }, [pedidoAlterado.motivo]);
   return (
     <Container fluid>
       <Row>
@@ -86,26 +163,54 @@ const ProrrogacaoPedido = ({ match }) => {
             </p>
             <p>Valor: {formatNumber(pedido.valor)}</p>
             <p>&nbsp;</p>
-            <Form>
+            <Col>
+              {message ? (
+                <Col className="text-center">
+                  <Alert variant={message.type}>{message.message}</Alert>
+                </Col>
+              ) : null}
+            </Col>
+            <Col></Col>
+            <Form onSubmit={handleSubmit}>
               {/* INPUT */}
               <Form.Group as={Row} controlId="alteracaoPedido">
                 <Col md={8}>
                   <Form.Label>Novo Prazo</Form.Label>
-                  <Form.Control type="date" required />
+                  <Form.Control
+                    type="date"
+                    required
+                    value={pedidoAlterado.novo_prazo}
+                    onChange={(e) =>
+                      setPedidoAlterado({
+                        ...pedidoAlterado,
+                        novo_prazo: e.target.value,
+                      })
+                    }
+                  />
                 </Col>
               </Form.Group>
               <Row>
                 <Col>
                   {/* INPUT */}
                   <Form.Label>Motivo</Form.Label>
-                  <Form.Control type="text" required />
+                  <Form.Control
+                    type="text"
+                    required
+                    value={pedidoAlterado.motivo}
+                    onChange={(e) =>
+                      setPedidoAlterado({
+                        ...pedidoAlterado,
+                        motivo: e.target.value,
+                      })
+                    }
+                  />
                 </Col>
               </Row>
               <p>&nbsp;</p>
               <Row>
                 <Col>
                   <Button variant="primary" type="submit" block>
-                    Alterar Pedido
+                    Prorrogar Pedido
                   </Button>
                 </Col>
               </Row>
@@ -113,6 +218,13 @@ const ProrrogacaoPedido = ({ match }) => {
             <p>&nbsp;</p>
             <p>
               <strong>OBS:</strong> Campo(s) de preenchimento obrigatório.
+            </p>
+            <p>
+              <Link to={{ pathname: `/` }}>
+                <Button variant="primary" size="sm">
+                  Voltar
+                </Button>
+              </Link>
             </p>
           </Col>
           <Col md={6}>
@@ -131,9 +243,22 @@ const ProrrogacaoPedido = ({ match }) => {
               com um assessor da Super GO através do Correio SISBB.
             </blockquote>
             <p>&nbsp;</p>
-            <Button variant="warning" type="submit" block>
+            <Button
+              variant="warning"
+              type="button"
+              onClick={() => handleSubmitFco()}
+              block
+            >
               Prorrogação FCO MÊS POSTERIOR
             </Button>
+            <p>&nbsp;</p>
+            <Col>
+              {messageFco ? (
+                <Col className="text-center">
+                  <Alert variant={messageFco.type}>{messageFco.message}</Alert>
+                </Col>
+              ) : null}
+            </Col>
             <p>&nbsp;</p>
             <h4>Orientações</h4>
             <p className="text-justify">
