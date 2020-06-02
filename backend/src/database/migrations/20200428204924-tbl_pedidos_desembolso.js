@@ -57,6 +57,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      linha_credito: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       linha_cop: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -135,10 +139,6 @@ module.exports = {
       },
       prefixo_op: {
         type: Sequelize.INTEGER,
-        allowNull: true,
-      },
-      prorrogado: {
-        type: Sequelize.BOOLEAN,
         allowNull: true,
       },
       matricula: {

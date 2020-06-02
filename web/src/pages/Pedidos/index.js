@@ -81,7 +81,6 @@ const Pedido = () => {
       Authorization: token,
     })
       .then((response) => {
-
         loadPedidos();
 
         setStatus({ type: "success", message: response.data.message });
@@ -223,33 +222,72 @@ const Pedido = () => {
                     }
                     required
                   >
-                    <option>AC</option>
-                    <option>AL</option>
-                    <option>AP </option>
-                    <option>AM </option>
-                    <option>BA </option>
-                    <option>CE</option>
-                    <option>DF</option>
-                    <option>ES</option>
-                    <option>GO</option>
-                    <option>MA</option>
-                    <option>MT</option>
-                    <option>MS</option>
-                    <option>MG</option>
-                    <option>PA </option>
-                    <option>PB</option>
-                    <option>PR</option>
-                    <option>PE</option>
-                    <option>PI</option>
-                    <option>RJ</option>
-                    <option>RN</option>
-                    <option>RS</option>
-                    <option>RO</option>
-                    <option>RR</option>
-                    <option>SC </option>
-                    <option>SP</option>
-                    <option>SE</option>
-                    <option>TO</option>
+                    <option>Selecione o Estado</option>
+                    <option value="AC">Acre - AC</option>
+                    <option value="AL">Alagoas - AL</option>
+                    <option value="AP">Amapá - AP </option>
+                    <option value="AM">Amazonas - AM </option>
+                    <option value="BA">Bahia - BA </option>
+                    <option value="CE">Ceará - CE</option>
+                    <option value="DF">Distrito Federal - DF</option>
+                    <option value="ES">Espírito Santo - ES</option>
+                    <option value="GO">Goiás - GO</option>
+                    <option value="MA">Maranhão - MA</option>
+                    <option value="MT">Mato Grosso - MT</option>
+                    <option value="MS">Mato Grosso do Sul - MS</option>
+                    <option value="MG">Minas Gerais - MG</option>
+                    <option value="PA">Pará - PA </option>
+                    <option value="PB">Paraíba - PB</option>
+                    <option value="PR">Paraná - PR</option>
+                    <option value="PE">Pernambuco - PE</option>
+                    <option value="PI">Piauí - PI</option>
+                    <option value="RJ">Rio de Janeiro - RJ</option>
+                    <option value="RN">Rio Grande do Norte - RN</option>
+                    <option value="RS">Rio Grande do Sul - RS</option>
+                    <option value="RO">Rondônia - RO</option>
+                    <option value="RR">Roraima - RR</option>
+                    <option value="SC">Santa Catarina - SC </option>
+                    <option value="SP">São Paulo - SP</option>
+                    <option value="SE">Sergipe - SE</option>
+                    <option value="TO">Tocantins - TO</option>
+                  </Form.Control>
+                </Col>
+                <Col>
+                  {/*INPUT*/}
+                  <Form.Label>Linha de Crédito</Form.Label>
+                  <Form.Control
+                    as="select"
+                    type="linha_credito"
+                    value={pedido.linha_credito}
+                    onChange={(e) =>
+                      setPedido({ ...pedido, linha_credito: e.target.value })
+                    }
+                    required
+                  >
+                    <option>Selecione a Linha</option>
+                    <option value="Pronaf Mais Alimentos">
+                      Pronaf Mais Alimentos
+                    </option>
+                    <option value="Pronaf Mais Alimentos - Máquinas e Equipamentos">
+                      Pronaf Mais Alimentos - Máquinas e Equipamentos
+                    </option>
+                    <option value="Custeio Agropecuário">
+                      Custeio Agropecuário
+                    </option>
+                    <option value="Pronamp Custeio">Pronamp Custeio</option>
+                    <option value="Investimento Agropecuário - MODERFROTA">
+                      Investimento Agropecuário - MODERFROTA
+                    </option>
+                    <option value="Investimento Agropecuário - Op de Longo Prazo">
+                      Investimento Agropecuário - Op de Longo Prazo
+                    </option>
+                    <option value="FCO Investimento">FCO Investimento</option>
+                    <option value="Pronamp Investimento">
+                      Pronamp Investimento
+                    </option>
+                    <option value="Comercilização - FEE - PGPM">
+                      Comercilização - FEE - PGPM
+                    </option>
                   </Form.Control>
                 </Col>
               </Row>
@@ -269,41 +307,31 @@ const Pedido = () => {
       <p>&nbsp;</p>
       <Row>
         <Col>
-          <Alert variant="success">
-            <h4>Em Análise</h4>
-          </Alert>
+          <h3>Em Análise</h3>
           <CustomTable pedidos={pedidos} tipo="ANALISE" />
         </Col>
       </Row>
       <Row>
         <Col>
-          <Alert variant="success">
-            <h4>Aguardando Recurso</h4>
-          </Alert>
+          <h3>Aguardando Recurso</h3>
           <CustomTable pedidos={pedidos} tipo="ESPERA" />
         </Col>
       </Row>
       <Row>
         <Col>
-          <Alert variant="success">
-            <h4>Solicitação de Prorrogação</h4>
-          </Alert>
-          <CustomTable pedidos={pedidos} tipo="ESPERA" prorrogacao />
+          <h3>Solicitação de Prorrogação</h3>
+          <CustomTable pedidos={pedidos} tipo="PRORROGADO" />
         </Col>
       </Row>
       <Row>
         <Col>
-          <Alert variant="success">
-            <h4>Pedidos Autorizados</h4>
-          </Alert>
+          <h3>Pedidos Autorizados</h3>
           <CustomTable pedidos={pedidos} tipo="AUTORIZADO" />
         </Col>
       </Row>
       <Row>
         <Col>
-          <Alert variant="success">
-            <h4>Pedidos Recusados</h4>
-          </Alert>
+          <h3>Pedidos Recusados</h3>
           <CustomTable pedidos={pedidos} tipo="EXCLUIDO" />
         </Col>
       </Row>

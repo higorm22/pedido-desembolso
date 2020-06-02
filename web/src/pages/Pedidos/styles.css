@@ -14,4 +14,11 @@ h4 {
   align-items: center !important;
 }
 
+h3 {
+  text-align: center !important;
+  align-items: center !important;
+  background-color: #bcd4b8;
+  width: 100%;
+}
+
 

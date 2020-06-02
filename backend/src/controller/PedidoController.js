@@ -40,7 +40,7 @@ const store = async (req, res) => {
     });
 
     if (dbPedido) {
-      if (dbPedido.status !== "EXCLUIDO") {
+      if (dbPedido.status !== "EXCLUIDO" && dbPedido.status !== "DEVOLVIDO") {
         return res.status(400).json({
           message:
             "Pedido já existe com No. da Proposta " +
@@ -80,6 +80,7 @@ const update = async (req, res) => {
     }
 
     await Pedido.update(pedido, { where: { id: dbPedido.id } });
+    console.log("Status pedido: ", dbPedido.status);
     return res.status(200).json({ pedido });
   } catch (error) {
     console.error(error);

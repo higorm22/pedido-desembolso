@@ -4,17 +4,19 @@ import { Link } from "react-router-dom";
 import { FaTrashAlt } from "react-icons/fa";
 import "./styles.css";
 
-const CustomTable = ({ pedidos, tipo, prorrogacao }) => {
+import {  formatNumber } from "../../util/format";
+
+const CustomTable = ({ pedidos, tipo }) => {
   return (
     <Table bordered hover  responsive="md">
       <thead>
         <tr>
           <th>Cliente</th>
           <th>Proposta</th>
+          <th>Linha Crédito</th>
           <th>Valor</th>
-          <th>Status</th>
           <th>Município</th>
-          {tipo === "ESPERA" && prorrogacao ? null : <th>Acões</th>}
+          {tipo === "PRORROGADO" ? null : <th>Acões</th>}
         </tr>
       </thead>
       <tbody>
@@ -29,10 +31,10 @@ const CustomTable = ({ pedidos, tipo, prorrogacao }) => {
               >
                 <td>{pedido.cliente}</td>
                 <td>{pedido.nr_proposta}</td>
-                <td>{pedido.valor}</td>
-                <td>{pedido.status}</td>
+                <td>{pedido.linha_credito}</td>
+                <td>{formatNumber(pedido.valor)}</td>
                 <td>{pedido.municipio}</td>
-                {tipo === "ESPERA" && pedido.prorrogado ? null : tipo ===
+                {tipo === "PRORROGADO" ? null : tipo ===
                   "AUTORIZADO" ? (
                   <td>
                     <Link to={{ pathname: `/prorrogacao-pedido/` + pedido.id }}>

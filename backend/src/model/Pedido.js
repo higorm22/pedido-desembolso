@@ -42,6 +42,10 @@ class Pedido extends Model {
           type: DataTypes.STRING,
           allowNull: true,
         },
+        linha_credito: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
         linha_cop: {
           type: DataTypes.STRING,
           allowNull: true,
@@ -114,10 +118,6 @@ class Pedido extends Model {
         },
         prefixo_op: {
           type: DataTypes.INTEGER,
-          allowNull: true,
-        },
-        prorrogado: {
-          type: DataTypes.BOOLEAN,
           allowNull: true,
         },
         matricula: {

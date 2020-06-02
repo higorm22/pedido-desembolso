@@ -42,7 +42,8 @@ const ProrrogacaoPedido = ({ match }) => {
       Authorization: token,
     })
       .then((response) => {
-        setPedido({ ...pedido, prorrogado: true, status: "ESPERA" });
+        pedido.status = "PRORROGADO";
+        setPedido({ ...pedido, status: "PRORROGADO" });
 
         Axios.put(`/pedidos/${pedido.id}`, pedido, {
           Authorization: token,
@@ -56,8 +57,8 @@ const ProrrogacaoPedido = ({ match }) => {
   };
 
   const handleSubmitFco = async () => {
-    console.log("Linha: ", pedido.linha_cop);
-    if (pedido.linha_cop !== "FCO") {
+    console.log("Linha: ", pedido.linha_credito);
+    if (pedido.linha_credito !== "FCO Investimento") {
       setMessageFco({
         type: "danger",
         message: "Pedido não corresponde ao FCO.",
@@ -66,34 +67,38 @@ const ProrrogacaoPedido = ({ match }) => {
     }
     const token = "Bearer " + ls.get("token");
 
-    setPedido({ ...pedido, prorrogado: true, status: "DEVOLVIDO" });
+    //setPedido({ ...pedido, prorrogado: true, status: "DEVOLVIDO" });
 
-    await Axios.put(`/pedidos/${pedido.id}`,pedido, {
+    pedido.status = "DEVOLVIDO";
+
+    await Axios.put(`/pedidos/${pedido.id}`, pedido, {
       Authorization: token,
     })
-    
       .then((response) => {
-        //setPedido(response.data);
-        setPedido({ 
-          ...pedido, 
-          prorrogado: true, 
-          status: "ESPERA", 
-          nr_proposta: pedido.data.nr_proposta,
-          cliente: pedido.data.cliente,
-          valor: pedido.data.valor,
-          mci: pedido.data.mci,
-          estado: pedido.data.estado,
-          municipio: pedido.data.municipio,
-         });
+        pedido.id = null;
+        pedido.status = "PRORROGADO";
+        setPedido({
+          ...pedido,
+          nr_proposta: pedido.nr_proposta,
+          cliente: pedido.cliente,
+          valor: pedido.valor,
+          mci: pedido.mci,
+          estado: pedido.estado,
+          municipio: pedido.municipio,
+          linha_credito: pedido.linha_credito,
+        });
+        console.log("Status Pedido: ", pedido.status);
         Axios.post("/pedidos", pedido, {
           Authorization: token,
         });
-        setMessageFco({ type: "success", message: response.data.message });
+        console.log("message Fco: ", response.data.message);
+        setMessageFco({
+          type: "success",
+          message: "Prorrogação Solicitada com Sucesso!",
+        });
       })
       .catch((error) => {
-        //console.log("messagem erro: ", error.response.data.message  );
-        //setPedido(error.data);
-        setMessageFco({ type: "danger", message: error.response.data.message });
+        setMessageFco({ type: "danger", messageFco: error.response.message });
       });
   };
 
