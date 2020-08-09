@@ -6,7 +6,7 @@ const routes = require('./routes');
 
 const server = express();
 
-server.use(cors());
+server.use(cors({credentials: true,origin:'http://localhost:3000'}));
 server.use(express.json());
 server.use(routes);
-server.listen(3333);
+server.listen(80);

@@ -4,9 +4,15 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Axios from "./services";
 import localStorage from "local-storage";
 
+
+
 export default function App() {
   const doLogin = () => {
-    Axios.post("/login")
+
+
+    console.log("Rodando doLogin");
+
+    Axios.post("/login") 
       .then(async (response) => {
         await localStorage.set("token", response.data.token);
         await localStorage.set("matricula", response.data.matricula);

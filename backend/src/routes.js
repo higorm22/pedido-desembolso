@@ -10,12 +10,21 @@ const authMiddleware = require('./middleware/auth');
 
 const routes = express.Router();
 
+const util = require("./util/filterUtil");
+
+ 
+routes.get('/sso-simulator', (req, res) => {
+    let simulator = util.simulateAuthInformation();
+  
+    return res.status(200).send(simulator);
+  });
+
 //Authentication
 routes.post('/login', LoginController.login);
 
 //Registering Middleware
 routes.use(authMiddleware.authenticate);
-
+ 
 //Pedidos de Desembolso
 routes.get('/pedidos',PedidoController.index);
 routes.get('/pedidos/:id',PedidoController.findById);
