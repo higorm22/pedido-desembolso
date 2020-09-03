@@ -6,6 +6,7 @@ const util = require("../util/filterUtil");
 
 const URL_LOGIN = "http://login.intranet.bb.com.br/distAuth/UI/Login?goto=";
 const NOME_COOKIE_SSO = "BBSSOToken";
+// const NOME_COOKIE_SSO = "BBSSOToken";
 const NOME_COOKIE_ACR = "ssoacr";
 const SERVIDOR_SSO_PADRAO = "sso.intranet.bb.com.br";
 
@@ -18,7 +19,7 @@ module.exports = {
 
   let cookies = cookie.parse(req.headers.cookie || '');
 
-  let tokenId = cookies[NOME_COOKIE_SSO];
+  let tokenId = req.headers.bbssotoken;
 
   if (!tokenId) {
     return res.status(403).json({
@@ -26,21 +27,29 @@ module.exports = {
     });
   }
 
-  let server = cookies[NOME_COOKIE_ACR];
+  // let server = cookies[NOME_COOKIE_ACR];
+  let server =req.headers.ssoacr;
+
+
+  if (!server) {
+    return res.status(403).json({
+      message: 'SSOACR não setado.',
+    });
+  }
 
   const parsedAttributes = await util.getUserAttributes(server, tokenId);
 
-  console.log(parsedAttributes);
-
   const matricula = parsedAttributes.chaveFuncionario;
   const prefixo = parsedAttributes["cd-pref-depe"];
+
+  const nome = parsedAttributes["cn"];
 
     try {
 
       const token = jwt.sign({ matricula, prefixo }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_TOKEN_EXPIRATION,
       });
-      res.status(200).send({ token, matricula, prefixo });
+      res.status(200).send({ token, user:{matricula, prefixo,nome} });
     } catch (error) {
       console.error(error);
       res

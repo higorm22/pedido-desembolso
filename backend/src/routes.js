@@ -16,6 +16,7 @@ const util = require("./util/filterUtil");
 routes.get('/sso-simulator', (req, res) => {
     let simulator = util.simulateAuthInformation();
   
+    console.log(simulator);
     return res.status(200).send(simulator);
   });
 

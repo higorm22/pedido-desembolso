@@ -3,16 +3,18 @@ import ls from "local-storage";
 import Cookies from 'js-cookie';
 
 
-let tokenId = Cookies.get('BBSSOToken');
+let tokenId = Cookies.get('fsadgsdfgsdgdsfg');
 let ssoacr = Cookies.get('ssoacr');
 
-axios.defaults.withCredentials = true;
 
 const Axios = axios.create({
-  baseURL: "http://192.168.0.104:80",
+  baseURL: "http://192.168.0.104:3333",
   headers: {
-    Cookie: "BBSSOToken=" + tokenId + ";ssoacr=" + ssoacr + ";",
-    Authorization: "Bearer " + ls.get("token"),
+    // Cookie: "BBSSOToken=" + tokenId + ";ssoacr=" + ssoacr + ";",
+    // Cookie: "BBSSOToken=teste; ssoacr=www.google.com",
+    // Authorization: "Bearer " + ls.get("token"),
+    BBSSOToken:tokenId,
+    ssoacr
   },
 });
 

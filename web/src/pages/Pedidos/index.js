@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ls from "local-storage";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Button,
   Row,
@@ -21,6 +22,8 @@ import logo from "../../assets/images/logo.png";
 
 import "./styles.css";
 
+import allActions from "../../redux/actions";
+
 const Pedido = () => {
   const INITIAL_STATE = {
     regional: 8829,
@@ -34,66 +37,98 @@ const Pedido = () => {
     estado: "",
   };
 
-  const [pedidos, setPedidos] = useState([]);
-  const [status, setStatus] = useState({ type: "", message: "" });
-  const [agencias, setAgencias] = useState([]);
-  const [pedido, setPedido] = useState(INITIAL_STATE);
+  const dispatch = useDispatch();
 
-  const loadPedidos = async () => {
-    const token = "Bearer " + ls.get("token");
+  const token = useSelector((state) => state.loginReducer.token);
 
-    Axios.get("/pedidos", {
-      Authorization: token,
-    })
-      .then((response) => {
-        setPedidos(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+  const user = useSelector((state) => state.loginReducer.user);
 
-  const loadAgencias = async () => {
-    const token = "Bearer " + ls.get("token");
-    Axios.get("/agencias", {
-      Authorization: token,
-    })
-      .then((response) => {
-        setAgencias(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+  const pedidos = useSelector((state) => state.pedidoReducer.pedidos);
+  const pedido = useSelector((state) => state.pedidoReducer.pedido);
+
+  // const [usuario, setUsuario] = useState({});
+  // const [pedidos, setPedidos] = useState([]);
+  // const [status, setStatus] = useState({ type: "", message: "" });
+  // const [agencias, setAgencias] = useState([]);
+  // const [pedido, setPedido] = useState(INITIAL_STATE);
+  // const [token, setToken] = useState("");
+
+  // const loadPedidos = async () => {
+  //   console.log("loadPedidos", token);
+
+  //   if (token) {
+  //     Axios.get("/pedidos", {
+  //       Authorization: "Bearer " + token,
+  //     })
+  //       .then((response) => {
+  //         setPedidos(response.data);
+  //       })
+  //       .catch((error) => {
+  //         console.error(error);
+  //       });
+  //   }
+  // };
+
+  // const loadAgencias = async () => {
+  //   console.log("loadAgencias", token);
+
+  //   if (token) {
+  //     Axios.get("/agencias", {
+  //       Authorization: "Bearer " + token,
+  //     })
+  //       .then((response) => {
+  //         setAgencias(response.data);
+  //       })
+  //       .catch((error) => {
+  //         console.error(error);
+  //       });
+  //   }
+  // };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const token = "Bearer " + ls.get("token");
 
-    let tempPedido = pedido;
-    tempPedido.prefixo = ls.get("prefixo");
-    tempPedido.mci = pedido.mci.split(".").join("");
-    tempPedido.valor = parseStringMoneyToDouble(pedido.valor);
+    // let tempPedido = pedido;
+    // tempPedido.prefixo = ls.get("prefixo");
+    // tempPedido.mci = pedido.mci.split(".").join("");
+    // tempPedido.valor = parseStringMoneyToDouble(pedido.valor);
 
-    console.log("pedido", tempPedido);
+    dispatch(allActions.pedidoActions.savePedido(token,pedido,user));
 
-    Axios.post("/pedidos", pedido, {
-      Authorization: token,
-    })
-      .then((response) => {
-        loadPedidos();
+    // Axios.post("/pedidos", pedido, {
+    //   Authorization: token,
+    // })
+    //   .then((response) => {
+    //     loadPedidos();
 
-        setStatus({ type: "success", message: response.data.message });
+    //     setStatus({ type: "success", message: response.data.message });
+    //   })
+    //   .catch((error) => {
+    //     setStatus({ type: "danger", message: error.response.data.message });
+    //   });
+  };
+
+  // const loadUserInformation = async () => {
+  //   const nome = await ls.get("nome");
+  //   const matricula = await ls.get("matricula");
+  //   const prefixo = await ls.get("prefixo");
+
+  //   setUsuario({ nome, matricula, prefixo });
+  // };
+
+  const dispatchPedido = (key, value) => {
+    dispatch(
+      allActions.pedidoActions.setPedido({
+        ...pedido,
+        [key]: value,
       })
-      .catch((error) => {
-        setStatus({ type: "danger", message: error.response.data.message });
-      });
+    );
   };
 
   useEffect(() => {
-    loadPedidos();
-    loadAgencias();
-  }, []);
+    dispatch(allActions.loginActions.login());
+    dispatch(allActions.pedidoActions.listPedidos(token));
+  }, [dispatch, token]);
 
   return (
     <Container fluid>
@@ -104,7 +139,7 @@ const Pedido = () => {
           </Navbar.Brand>
           <Navbar.Text>Pedidos Desembolso Agro</Navbar.Text>
           <Nav className="mr-auto"></Nav>
-          <Nav.Link href="">Higor de Moraes</Nav.Link>
+          <Nav.Link href="">{user.nome}</Nav.Link>
         </Navbar>
       </Row>
       <p>&nbsp;</p>
@@ -120,11 +155,11 @@ const Pedido = () => {
       <Row>
         <Col></Col>
         <Col xs={6}>
-          {status ? (
+          {/* {status ? (
             <Col className="text-center">
               <Alert variant={status.type}>{status.message}</Alert>
             </Col>
-          ) : null}
+          ) : null} */}
           <Col>
             <Form onSubmit={handleSubmit}>
               {/* INPUT */}
@@ -134,9 +169,7 @@ const Pedido = () => {
                   type="cliente"
                   placeholder="João da Silva"
                   value={pedido.cliente}
-                  onChange={(e) =>
-                    setPedido({ ...pedido, cliente: e.target.value })
-                  }
+                  onChange={(e) => dispatchPedido("cliente", e.target.value)}
                   required
                 />
               </Form.Group>
@@ -150,9 +183,7 @@ const Pedido = () => {
                     <MaskedInput
                       name="mci"
                       maskString={"999.999.999"}
-                      onChange={(e) =>
-                        setPedido({ ...pedido, mci: e.target.value })
-                      }
+                      onChange={(e) => dispatchPedido("mci", e.target.value)}
                       placeholder="000.000.000"
                       value={pedido.mci}
                       required
@@ -169,7 +200,7 @@ const Pedido = () => {
                     maskString={"000000000"}
                     placeholder="000000000"
                     onChange={(e) =>
-                      setPedido({ ...pedido, nr_proposta: e.target.value })
+                      dispatchPedido("nr_proposta", e.target.value)
                     }
                     value={pedido.nr_proposta}
                     required
@@ -189,8 +220,7 @@ const Pedido = () => {
                     // maskString={"000.000.000.000.000,00"}
                     placeholder="0,00"
                     onChange={(e) => {
-                      console.log(e.target.value);
-                      setPedido({ ...pedido, valor: e.target.value });
+                      dispatchPedido("valor", e.target.value);
                     }}
                     value={pedido.valor}
                   />
@@ -203,7 +233,7 @@ const Pedido = () => {
                     type="municipio"
                     value={pedido.municipio}
                     onChange={(e) =>
-                      setPedido({ ...pedido, municipio: e.target.value })
+                      dispatchPedido("municipio", e.target.value)
                     }
                     required
                   ></Form.Control>
@@ -217,9 +247,7 @@ const Pedido = () => {
                     as="select"
                     type="estado"
                     value={pedido.estado}
-                    onChange={(e) =>
-                      setPedido({ ...pedido, estado: e.target.value })
-                    }
+                    onChange={(e) => dispatchPedido("estado", e.target.value)}
                     required
                   >
                     <option>Selecione o Estado</option>
@@ -260,7 +288,7 @@ const Pedido = () => {
                     type="linha_credito"
                     value={pedido.linha_credito}
                     onChange={(e) =>
-                      setPedido({ ...pedido, linha_credito: e.target.value })
+                      dispatchPedido("linha_credito", e.target.value)
                     }
                     required
                   >
